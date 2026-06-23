@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Sign In - C2D EVKit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#22C55E",
+                        "ev-black": "#020617",
+                        "ev-dark": "#0F172A"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2 { font-family: 'Montserrat', sans-serif; }
+    </style>
+</head>
+<body class="bg-ev-black text-white flex items-center justify-center min-h-screen p-6">
+
+    <div class="w-full max-w-md">
+        <!-- Logo -->
+        <div class="flex justify-center mb-8">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHW7QX5Gcx9HyNP0fx6oc2vr5zPoe6axUJZ-rlQ2f_NjTDgN_9E7pl76bnkfDFjWLaRk9xBaNQi9MhgB6_gS1OCzDcwpcInyStp5fwN7nlcUgBuX3TjDnwLVP51vqj92KgNbqYeHWSTgXck6i1y831wzIrYE9pdkGb9N9AtjQW9Mlve5sHuHcJZ7R2vo8FgGIIG5AN1Tq4WRUd08HZau72BWpjjC8K_KBViLxzARq558ZtFmJZ_eC9lMD1xY3cxT2HNBpNZe5jYEs" alt="C2D EVKit" class="h-10 w-auto">
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-white text-ev-black rounded-[2rem] p-6 sm:p-8 shadow-2xl overflow-hidden relative">
+            <div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+            <h1 class="text-2xl font-bold mb-8 text-center">Sign in to your account</h1>
+
+            <form action="login-process.php" method="POST" class="space-y-5">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2 px-1">Email address</label>
+                    <input type="email" name="email" required placeholder="name@example.com" class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-gray-300">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2 px-1">Password</label>
+                    <input type="password" name="password" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-gray-300">
+                </div>
+
+                <button type="submit" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl mt-4 shadow-[0_10px_20px_-10px_rgba(34,197,94,0.5)] hover:shadow-[0_15px_25px_-10px_rgba(34,197,94,0.6)] hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-wider text-sm">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="relative flex py-4 items-center">
+                <div class="flex-grow border-t border-gray-100"></div>
+                <span class="flex-shrink mx-4 text-gray-400 text-xs uppercase tracking-widest font-semibold">Or</span>
+                <div class="flex-grow border-t border-gray-100"></div>
+            </div>
+
+            <a href="login-process.php?guest=1" class="w-full flex justify-center items-center bg-gray-50 border border-gray-100 hover:bg-gray-100 hover:border-gray-200 text-gray-600 font-bold py-3.5 rounded-xl transition-all uppercase tracking-wider text-sm">
+                Continue as Guest
+            </a>
+
+            <div class="mt-8 text-center border-t border-gray-50 pt-6">
+                <p class="text-[11px] text-gray-400">Don't have an account? <a href="register.html" class="text-primary font-bold hover:underline">Get Started</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            
+            // 1. Trigger Welcome Alert for New Users
+            if (params.get('status') === 'new_success' && params.get('user')) {
+                const userName = decodeURIComponent(params.get('user'));
+                alert("Successfully registered and Happy learning!");
+                
+                // 2. Clean up the URL address bar immediately
+                const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+            }
+
+            // 3. Handle login errors and display them above the form
+            if (params.get('status') === 'error') {
+                const message = params.get('message');
+                const form = document.querySelector('form');
+                
+                // Create error alert element
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'bg-red-500/10 border border-red-500/50 text-red-500 text-xs p-3 rounded-xl mb-6 text-center italic';
+                
+                if (message === 'EmailNotFound') {
+                    alertDiv.innerHTML = 'This email is not registered. Would you like to <a href="register.html" class="underline font-bold text-primary">register a new account</a>?';
+                } else if (message === 'IncorrectPassword') {
+                    alertDiv.textContent = 'Incorrect password. Please try again.';
+                } else {
+                    alertDiv.textContent = 'Invalid email or password.';
+                }
+                
+                form.parentNode.insertBefore(alertDiv, form);
+                
+                // Clean up the URL address bar immediately
+                const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+            }
+        });
+    </script>
+</body>
+</html>
