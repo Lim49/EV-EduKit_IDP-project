@@ -805,6 +805,11 @@ if (!isset($progress_rows[1]) || $progress_rows[1] !== 'Completed') {
 
         setInterval(pollKitStatus, 2000);
         pollKitStatus();
+
+        // Heartbeat to keep kit pairing active
+        setInterval(() => {
+            fetch('api/heartbeat.php').catch(err => console.error(err));
+        }, 5000);
     })();
     </script>
 </body>

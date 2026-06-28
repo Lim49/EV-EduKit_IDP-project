@@ -13,12 +13,22 @@ $user_id   = (int)$_SESSION['user_id'];
 
 // Fetch current linked kit if any
 $pdo->exec("CREATE TABLE IF NOT EXISTS kit_sessions (
-    kit_mac   VARCHAR(17) NOT NULL,
-    user_id   INT         NOT NULL,
-    linked_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    kit_mac     VARCHAR(17) NOT NULL,
+    user_id     INT         NOT NULL,
+    linked_at   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    last_active TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (kit_mac),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )");
+
+try {
+    $pdo->exec("ALTER TABLE kit_sessions ADD COLUMN last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+} catch (\PDOException $e) {
+    // Column already exists
+}
+
+// Clean up expired sessions (no heartbeat in the last 20 seconds)
+$pdo->exec("DELETE FROM kit_sessions WHERE last_active < NOW() - INTERVAL 20 SECOND");
 
 $stmt = $pdo->prepare("SELECT kit_mac, linked_at FROM kit_sessions WHERE user_id = ? LIMIT 1");
 $stmt->execute([$user_id]);
@@ -234,6 +244,11 @@ if (empty($avail_kits)) {
             if (formatted.length > 17) formatted = formatted.substring(0, 17);
             e.target.value = formatted;
         });
+
+        // Heartbeat to keep kit pairing active
+        setInterval(() => {
+            fetch('api/heartbeat.php').catch(err => console.error(err));
+        }, 5000);
     </script>
 </body>
 </html>

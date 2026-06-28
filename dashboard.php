@@ -677,6 +677,11 @@ if (!isset($progress_rows[1]) || $progress_rows[1] !== 'Completed') {
                 }
             });
         }
+
+        // Heartbeat to keep kit pairing active
+        setInterval(() => {
+            fetch('api/heartbeat.php').catch(err => console.error(err));
+        }, 5000);
     </script>
 
     <footer class="bg-[#020617] border-t border-white/10 py-3 w-full">

@@ -572,7 +572,7 @@ if (!isset($progress_rows[1]) || $progress_rows[1] !== 'Completed') {
       <h3 class="font-headline-md text-lg text-center text-white mb-6">Demo video</h3>
       <div class="flex justify-center">
         <div class="w-full max-w-3xl aspect-video rounded-3xl overflow-hidden shadow-2xl border border-white/10">
-          <iframe class="w-full h-full" src="https://www.youtube.com/embed/XR6AWwJOYMY" title="C2D EVKit Guideline" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <iframe class="w-full h-full" src="https://www.youtube.com/embed/fkE3xXpfQMQ" title="C2D EVKit Guideline" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -785,5 +785,10 @@ if (!isset($progress_rows[1]) || $progress_rows[1] !== 'Completed') {
           }
       });
   }
+
+  // Heartbeat to keep kit pairing active
+  setInterval(() => {
+      fetch('api/heartbeat.php').catch(err => console.error(err));
+  }, 5000);
 </script>
 </body></html>

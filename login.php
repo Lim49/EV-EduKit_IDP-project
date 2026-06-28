@@ -40,12 +40,19 @@ if (isset($_GET['guest']) && isset($pdo)) {
         // 3. Auto-link a mock kit so they bypass the pairing redirect
         $mock_mac = '00:11:22:33:44:55';
         $pdo->exec("CREATE TABLE IF NOT EXISTS kit_sessions (
-            kit_mac   VARCHAR(17) NOT NULL,
-            user_id   INT         NOT NULL,
-            linked_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            kit_mac     VARCHAR(17) NOT NULL,
+            user_id     INT         NOT NULL,
+            linked_at   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+            last_active TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (kit_mac),
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )");
+        
+        try {
+            $pdo->exec("ALTER TABLE kit_sessions ADD COLUMN last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+        } catch (\PDOException $e) {
+            // Column already exists
+        }
         
         $stmt_kit = $pdo->prepare("INSERT INTO kit_sessions (kit_mac, user_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE user_id = VALUES(user_id)");
         $stmt_kit->execute([$mock_mac, $guest_id]);
@@ -54,8 +61,8 @@ if (isset($_GET['guest']) && isset($pdo)) {
         $_SESSION['user_id'] = $guest_id;
         $_SESSION['full_name'] = $guest_name;
 
-        // 5. Redirect to Home.php
-        header("Location: Home.php?user=" . urlencode($guest_name));
+        // 5. Redirect to pair-kit.php
+        header("Location: pair-kit.php");
         exit();
     } catch (PDOException $e) {
         $error = "Guest login failed: " . $e->getMessage();
@@ -77,7 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($pdo)) {
     } else {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['full_name'];
-        header('Location: dashboard.php');
+        $_SESSION['full_name'] = $user['full_name'];
+        header('Location: pair-kit.php');
         exit;
     }
 }

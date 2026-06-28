@@ -58,6 +58,9 @@ try {
         ];
     }
 
+    // Clean up expired sessions (no heartbeat in the last 20 seconds)
+    $pdo->exec("DELETE FROM kit_sessions WHERE last_active < NOW() - INTERVAL 20 SECOND");
+
     // 3. Determine if the kit is actually online (last_seen within 15 seconds)
     $online = false;
     $stmtMac = $pdo->prepare("SELECT kit_mac FROM kit_sessions WHERE user_id = ?");

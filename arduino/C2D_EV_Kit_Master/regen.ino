@@ -12,6 +12,16 @@
 #define MIN_SPEED   150
 #define MAX_SPEED   255
 
+#include <esp_arduino_version.h>
+#if defined(ESP_ARDUINO_VERSION) && ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+  #define motorLedsAttach()      ledcAttach(ENA, PWM_FREQ, PWM_RES)
+  #define motorLedsWrite(duty)   ledcWrite(ENA, duty)
+#else
+  #define MOTOR_PWM_CHANNEL      0
+  #define motorLedsAttach()      do { ledcSetup(MOTOR_PWM_CHANNEL, PWM_FREQ, PWM_RES); ledcAttachPin(ENA, MOTOR_PWM_CHANNEL); } while(0)
+  #define motorLedsWrite(duty)   ledcWrite(MOTOR_PWM_CHANNEL, duty)
+#endif
+
 bool motorIsRunning = false;
 
 // Threshold to decide pedal on vs off
@@ -36,7 +46,7 @@ void setupRegenLeds() {
   pinMode(IN2, OUTPUT);
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
-  ledcAttach(ENA, PWM_FREQ, PWM_RES);
+  motorLedsAttach();
 }
 
 // Pedal pressed: 1→2 red, then 3→4 green
@@ -85,13 +95,13 @@ void updateRegenLeds() {
   if (potValue > 5) {
     motorSpeed = map(potValue, 5, 4095, MIN_SPEED, MAX_SPEED);
     if (!motorIsRunning) {
-      ledcWrite(ENA, 255);
+      motorLedsWrite(255);
       delay(40);
       motorIsRunning = true;
     }
-    ledcWrite(ENA, motorSpeed);
+    motorLedsWrite(motorSpeed);
   } else {
-    ledcWrite(ENA, 0);
+    motorLedsWrite(0);
     motorIsRunning = false;
   }
 

@@ -5,6 +5,14 @@ require_once 'db.php';
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
     
+    // Automatically unlink any paired kit for this user upon logout
+    try {
+        $stmt_unlink = $pdo->prepare("DELETE FROM kit_sessions WHERE user_id = ?");
+        $stmt_unlink->execute([$user_id]);
+    } catch (\PDOException $e) {
+        // Table might not exist yet or other DB issue
+    }
+    
     // Check if this user is a guest (by email pattern)
     $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
     $stmt->execute([$user_id]);

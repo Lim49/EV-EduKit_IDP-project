@@ -491,6 +491,11 @@ if (!isset($progress_rows[1]) || $progress_rows[1] !== 'Completed') {
                 sidebar.classList.add('translate-x-full');
             }
         });
+
+        // Heartbeat to keep kit pairing active
+        setInterval(() => {
+            fetch('api/heartbeat.php').catch(err => console.error(err));
+        }, 5000);
     </script>
 </body>
 </html>

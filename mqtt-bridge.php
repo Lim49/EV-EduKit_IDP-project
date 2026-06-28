@@ -24,12 +24,19 @@ $clientId = 'evkit_backend_bridge_' . uniqid();
 try {
     // 1. kit_sessions
     $pdo->exec("CREATE TABLE IF NOT EXISTS kit_sessions (
-        kit_mac   VARCHAR(17) NOT NULL,
-        user_id   INT         NOT NULL,
-        linked_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        kit_mac     VARCHAR(17) NOT NULL,
+        user_id     INT         NOT NULL,
+        linked_at   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+        last_active TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (kit_mac),
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )");
+
+    try {
+        $pdo->exec("ALTER TABLE kit_sessions ADD COLUMN last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+    } catch (\PDOException $e) {
+        // Column already exists
+    }
 
     // 2. kit_available
     $pdo->exec("CREATE TABLE IF NOT EXISTS kit_available (

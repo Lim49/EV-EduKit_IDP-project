@@ -13,6 +13,8 @@
 TFT_eSPI tft = TFT_eSPI();
 
 // ── WiFi & HiveMQ Cloud MQTT Configuration ─────────────────────────────────────
+#include <FS.h>
+using fs::File;
 #include <WiFi.h>
 #include <WebServer.h>
 #include <AutoConnect.h>

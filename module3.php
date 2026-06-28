@@ -527,7 +527,7 @@ if (!isset($progress_rows[1]) || $progress_rows[1] !== 'Completed') {
                                 3.2 Momentum to Electric
                             </div>
 
-                            <div class="grid lg:grid-cols-2 gap-6 items-center">
+                            <div class="space-y-6">
                                 <div class="space-y-4">
                                     <div class="space-y-2">
                                         <h3 class="text-xl md:text-headline-lg text-white">Regenerative Braking</h3>
@@ -554,8 +554,8 @@ if (!isset($progress_rows[1]) || $progress_rows[1] !== 'Completed') {
                                         <strong class="text-white">Take note:</strong> The motor generates AC power during regenerative braking. This AC must travel back through the inverter to be converted back into DC before it can be stored in the high-voltage lithium-ion battery.
                                     </div>
                                 </div>
-                                <div class="flex items-center justify-center">
-                                    <img src="image/regen.png" alt="Regenerative Braking Flow" class="w-full h-auto object-contain">
+                                <div class="flex items-center justify-center pt-4">
+                                    <img src="image/regen.png" alt="Regenerative Braking Flow" class="max-w-3xl w-full h-auto object-contain">
                                 </div>
                             </div>
                         </div>
@@ -636,6 +636,11 @@ if (!isset($progress_rows[1]) || $progress_rows[1] !== 'Completed') {
                 sidebar.classList.add('translate-x-full');
             }
         });
+
+        // Heartbeat to keep kit pairing active
+        setInterval(() => {
+            fetch('api/heartbeat.php').catch(err => console.error(err));
+        }, 5000);
     </script>
 </body>
 </html>
